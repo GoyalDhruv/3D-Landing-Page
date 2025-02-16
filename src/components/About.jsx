@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import AnimatedTitle from './AnimatedTitle'
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -8,6 +8,46 @@ import { ScrollTrigger } from 'gsap/all';
 gsap.registerPlugin(ScrollTrigger);
 
 function About() {
+
+    const frameRef = useRef(null);
+
+    const handleMouseMove = (e) => {
+        const { clientX, clientY } = e;
+        const element = frameRef.current;
+
+        if (!element) return;
+
+        const rect = element.getBoundingClientRect();
+        const xPos = clientX - rect.left;
+        const yPos = clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((yPos - centerY) / centerY) * -10;
+        const rotateY = ((xPos - centerX) / centerX) * 10;
+
+        gsap.to(element, {
+            duration: 0.3,
+            rotateX,
+            rotateY,
+            transformPerspective: 500,
+            ease: "power1.inOut",
+        });
+    };
+
+    const handleMouseLeave = () => {
+        const element = frameRef.current;
+
+        if (element) {
+            gsap.to(element, {
+                duration: 0.5,
+                rotateX: 0,
+                rotateY: 0,
+                ease: "power1.inOut",
+            });
+        }
+    };
 
     useGSAP(() => {
         const clipAnimation = gsap.timeline({
@@ -21,10 +61,11 @@ function About() {
             },
         });
 
-        clipAnimation.to(".mask-clip-path", {
+        clipAnimation.to(".about-mask-clip-path", {
             width: "100vw",
             height: "100vh",
             borderRadius: 0,
+            clipPath: "polygon(10% 10%, 90% 0%, 95% 100%, 0% 90%)",
         });
     });
 
@@ -50,9 +91,14 @@ function About() {
             </div>
 
             <div className="h-dvh w-screen" id="clip">
-                <div className="mask-clip-path about-image">
+                <div className="about-mask-clip-path about-image !rounded-none">
                     <img
+                        ref={frameRef}
                         src="img/about.webp"
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={handleMouseLeave}
+                        onMouseUp={handleMouseLeave}
+                        onMouseEnter={handleMouseLeave}
                         alt="Background"
                         className="absolute left-0 top-0 size-full object-cover"
                     />
