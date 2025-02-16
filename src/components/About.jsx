@@ -1,53 +1,14 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import AnimatedTitle from './AnimatedTitle'
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
+import { BentoCard, BentoTilt } from './TiltingEffect';
 
 
 gsap.registerPlugin(ScrollTrigger);
 
 function About() {
-
-    const frameRef = useRef(null);
-
-    const handleMouseMove = (e) => {
-        const { clientX, clientY } = e;
-        const element = frameRef.current;
-
-        if (!element) return;
-
-        const rect = element.getBoundingClientRect();
-        const xPos = clientX - rect.left;
-        const yPos = clientY - rect.top;
-
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        const rotateX = ((yPos - centerY) / centerY) * -10;
-        const rotateY = ((xPos - centerX) / centerX) * 10;
-
-        gsap.to(element, {
-            duration: 0.3,
-            rotateX,
-            rotateY,
-            transformPerspective: 500,
-            ease: "power1.inOut",
-        });
-    };
-
-    const handleMouseLeave = () => {
-        const element = frameRef.current;
-
-        if (element) {
-            gsap.to(element, {
-                duration: 0.5,
-                rotateX: 0,
-                rotateY: 0,
-                ease: "power1.inOut",
-            });
-        }
-    };
 
     useGSAP(() => {
         const clipAnimation = gsap.timeline({
@@ -92,16 +53,12 @@ function About() {
 
             <div className="h-dvh w-screen" id="clip">
                 <div className="about-mask-clip-path about-image !rounded-none">
-                    <img
-                        ref={frameRef}
-                        src="img/about.webp"
-                        onMouseMove={handleMouseMove}
-                        onMouseLeave={handleMouseLeave}
-                        onMouseUp={handleMouseLeave}
-                        onMouseEnter={handleMouseLeave}
-                        alt="Background"
-                        className="absolute left-0 top-0 size-full object-cover"
-                    />
+                    <BentoTilt className="absolute left-0 top-0 size-full object-cover">
+                        <BentoCard
+                            src="img/about.webp"
+                            isImage={true}
+                        />
+                    </BentoTilt>
                 </div>
             </div>
         </div>
